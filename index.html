@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>FDS OS Beta</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1e1e2f, #3a3a5c);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .taskbar {
+      height: 40px;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+      color: #fff;
+    }
+    .taskbar .start {
+      background: #3b82f6;
+      padding: 5px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .desktop {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      padding: 20px;
+      gap: 20px;
+    }
+    .icon {
+      width: 80px;
+      text-align: center;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .icon:hover {
+      transform: scale(1.1);
+    }
+    .icon img {
+      width: 64px;
+      height: 64px;
+      display: block;
+      margin: 0 auto 5px;
+    }
+    .window {
+      position: absolute;
+      top: 80px;
+      left: 80px;
+      width: 500px;
+      height: 380px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .window-header {
+      background: #3b82f6;
+      color: #fff;
+      padding: 8px;
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: grab;
+    }
+    .window-content {
+      flex: 1;
+      padding: 10px;
+      color: #000;
+      overflow: auto;
+    }
+    .close-btn {
+      background: #ef4444;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .shutdown-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: #0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      z-index: 9999;
+    }
+    iframe {
+      border: none;
+      width: 100%;
+      height: 90%;
+      margin-top: 10px;
+    }
+    .calc input {
+      width: 100%;
+      height: 40px;
+      font-size: 1.2rem;
+      text-align: right;
+      margin-bottom: 10px;
+    }
+    .calc button {
+      width: 23%;
+      height: 40px;
+      margin: 1%;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background: #3b82f6;
+      color: #fff;
+    }
+    .license, .settings {
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+    .settings input {
+      width: 80%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .settings button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      background: #3b82f6;
+      color: #fff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <div class="icon" onclick="openWindow('app')">
+      <img src="https://cdn-icons-png.flaticon.com/512/841/841364.png" alt="App">
+      <span>App FDS</span>
+    </div>
+    <div class="icon" onclick="openWindow('calc')">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135692.png" alt="Calc">
+      <span>Calculadora</span>
+    </div>
+    <div class="icon" onclick="openWindow('web')">
+      <img src="https://cdn-icons-png.flaticon.com/512/84/84470.png" alt="Web">
+      <span>Navegador</span>
+    </div>
+    <div class="icon" onclick="openWindow('license')">
+      <img src="https://cdn-icons-png.flaticon.com/512/942/942751.png" alt="Licença">
+      <span>Licença</span>
+    </div>
+    <div class="icon" onclick="openWindow('settings')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Configurações">
+      <span>Configurações</span>
+    </div>
+    <div class="icon" onclick="shutdown()">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="Power">
+      <span>Desligar</span>
+    </div>
+  </div>
+  <div class="taskbar">
+    <div class="start">FDS Beta</div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <div class="window" id="app">
+    <div class="window-header">
+      <span>Janela FDS</span>
+      <button class="close-btn" onclick="closeWindow('app')"></button>
+    </div>
+    <div class="window-content">
+      Bem-vindo ao <strong>FDS OS Beta</strong> 🚀
+    </div>
+  </div>
+
+  <div class="window" id="calc">
+    <div class="window-header">
+      <span>Calculadora</span>
+      <button class="close-btn" onclick="closeWindow('calc')"></button>
+    </div>
+    <div class="window-content calc">
+      <input type="text" id="calc-display" readonly>
+      <div>
+        <button onclick="press('7')">7</button>
+        <button onclick="press('8')">8</button>
+        <button onclick="press('9')">9</button>
+        <button onclick="press('/')">/</button>
+      </div>
+      <div>
+        <button onclick="press('4')">4</button>
+        <button onclick="press('5')">5</button>
+        <button onclick="press('6')">6</button>
+        <button onclick="press('*')">*</button>
+      </div>
+      <div>
+        <button onclick="press('1')">1</button>
+        <button onclick="press('2')">2</button>
+        <button onclick="press('3')">3</button>
+        <button onclick="press('-')">-</button>
+      </div>
+      <div>
+        <button onclick="press('0')">0</button>
+        <button onclick="press('.')">.</button>
+        <button onclick="calculate()">=</button>
+        <button onclick="press('+')">+</button>
+      </div>
+      <div>
+        <button onclick="press('(')">(</button>
+        <button onclick="press(')')">)</button>
+        <button onclick="press('%')">%</button>
+        <button onclick="clearCalc()">C</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="window" id="web">
+    <div class="window-header">
+      <span>Navegador</span>
+      <button class="close-btn" onclick="closeWindow('web')"></button>
+    </div>
+    <div class="window-content">
+      <input type="text" id="url" placeholder="Digite a URL" style="width: 80%">
+      <button onclick="openSite()">Ir</button>
+      <iframe id="browser" src="https://www.google.com"></iframe>
+    </div>
+  </div>
+
+  <div class="window" id="license">
+    <div class="window-header">
+      <span>Termo de Licença</span>
+      <button class="close-btn" onclick="closeWindow('license')"></button>
+    </div>
+    <div class="window-content license">
+      <h3>Termo de Licença do FDS OS Beta</h3>
+      <p>Ao utilizar este sistema, você concorda que ele é experimental, pode conter falhas e é oferecido "como está".</p>
+      <p>Este software não oferece garantias de estabilidade ou suporte oficial. Uso por sua conta e risco.</p>
+      <p>© 2025 FDS Softwares.</p>
+    </div>
+  </div>
+
+  <div class="window" id="settings">
+    <div class="window-header">
+      <span>Configurações</span>
+      <button class="close-btn" onclick="closeWindow('settings')"></button>
+    </div>
+    <div class="window-content settings">
+      <h3>Inserir Chave de Produto</h3>
+      <input type="text" id="productKey" placeholder="XXXXX-XXXXX-XXXXX">
+      <button onclick="activateKey()">Ativar</button>
+      <p id="activation-status"></p>
+    </div>
+  </div>
+
+  <div id="shutdown" class="shutdown-screen" style="display:none;">Desligando...</div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function openWindow(id) {
+      document.getElementById(id).style.display = 'flex';
+    }
+    function closeWindow(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function press(val) {
+      document.getElementById('calc-display').value += val;
+    }
+    function calculate() {
+      try {
+        document.getElementById('calc-display').value = eval(document.getElementById('calc-display').value);
+      } catch {
+        document.getElementById('calc-display').value = 'Erro';
+      }
+    }
+    function clearCalc() {
+      document.getElementById('calc-display').value = '';
+    }
+
+    function openSite() {
+      const url = document.getElementById('url').value;
+      if(url) {
+        window.open(url.startsWith('http') ? url : 'https://' + url, '_blank');
+      }
+    }
+
+    function activateKey() {
+      const key = document.getElementById('productKey').value;
+      const status = document.getElementById('activation-status');
+      if(key.length >= 10) {
+        status.textContent = "✅ Chave aceita. Produto ativado.";
+        status.style.color = "green";
+      } else {
+        status.textContent = "❌ Chave inválida.";
+        status.style.color = "red";
+      }
+    }
+
+    function shutdown() {
+      document.getElementById('shutdown').style.display = 'flex';
+      setTimeout(() => {
+        document.getElementById('shutdown').style.display = 'none';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
