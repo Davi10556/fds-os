@@ -1,332 +1,520 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>FDS OS Beta</title>
+  <meta charset="utf-8" />
+  <title>FDS OS (BETA) — Atualizável</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    :root{
+      --bg-dark: linear-gradient(135deg,#1e1e2f,#3a3a5c);
+      --panel:#ffffff;
+      --accent:#3b82f6;
+      --text-dark:#000;
+      --text-light:#fff;
     }
-    body {
-      background: linear-gradient(135deg, #1e1e2f, #3a3a5c);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    *{box-sizing:border-box;font-family:Inter,Arial,Helvetica,sans-serif}
+    html,body{height:100%;margin:0}
+    body{
+      background:var(--bg-dark);
+      color:var(--text-light);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
     }
-    .taskbar {
-      height: 40px;
-      background: #222;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 10px;
-      color: #fff;
-    }
-    .taskbar .start {
-      background: #3b82f6;
-      padding: 5px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .desktop {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      padding: 20px;
-      gap: 20px;
-    }
-    .icon {
-      width: 80px;
-      text-align: center;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .icon:hover {
-      transform: scale(1.1);
-    }
-    .icon img {
-      width: 64px;
-      height: 64px;
-      display: block;
-      margin: 0 auto 5px;
-    }
-    .window {
-      position: absolute;
-      top: 80px;
-      left: 80px;
-      width: 500px;
-      height: 380px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .window-header {
-      background: #3b82f6;
-      color: #fff;
-      padding: 8px;
-      border-radius: 8px 8px 0 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: grab;
-    }
-    .window-content {
-      flex: 1;
-      padding: 10px;
-      color: #000;
-      overflow: auto;
-    }
-    .close-btn {
-      background: #ef4444;
-      border: none;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-    .shutdown-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #000;
-      color: #0f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      z-index: 9999;
-    }
-    iframe {
-      border: none;
-      width: 100%;
-      height: 90%;
-      margin-top: 10px;
-    }
-    .calc input {
-      width: 100%;
-      height: 40px;
-      font-size: 1.2rem;
-      text-align: right;
-      margin-bottom: 10px;
-    }
-    .calc button {
-      width: 23%;
-      height: 40px;
-      margin: 1%;
-      font-size: 1rem;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #3b82f6;
-      color: #fff;
-    }
-    .license, .settings {
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-    .settings input {
-      width: 80%;
-      padding: 5px;
-      margin-bottom: 10px;
-    }
-    .settings button {
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      background: #3b82f6;
-      color: #fff;
-      cursor: pointer;
-    }
+    .desktop{flex:1;padding:20px;display:flex;flex-wrap:wrap;gap:18px;align-content:flex-start}
+    .icon{width:88px;text-align:center;cursor:pointer;user-select:none}
+    .icon img{width:64px;height:64px;border-radius:12px;display:block;margin:0 auto 6px;box-shadow:0 6px 18px rgba(0,0,0,0.35)}
+    .taskbar{height:46px;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+    .start{background:var(--accent);padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:700}
+    .clock{font-weight:600}
+    /* windows */
+    .window{position:absolute;width:520px;height:380px;background:var(--panel);color:var(--text-dark);border-radius:10px;box-shadow:0 20px 50px rgba(8,8,20,0.6);display:none;flex-direction:column;overflow:hidden}
+    .title{background:var(--accent);color:white;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:grab}
+    .title .title-text{font-weight:700}
+    .title .close{width:28px;height:28px;border-radius:50%;background:#ef4444;border:none;color:white;cursor:pointer}
+    .body{padding:12px;flex:1;overflow:auto}
+    /* calc */
+    .calc input{width:100%;height:44px;font-size:1.2rem;text-align:right;padding:6px;margin-bottom:10px}
+    .calc .row{display:flex;gap:8px;margin-bottom:8px}
+    .calc button{flex:1;height:44px;border-radius:6px;border:none;background:var(--accent);color:white;font-weight:700;cursor:pointer}
+    /* settings */
+    .field{margin-bottom:10px}
+    label{display:block;margin-bottom:6px;font-size:0.9rem;color:#333}
+    input[type="text"],input[type="password"],textarea{width:100%;padding:8px;border-radius:6px;border:1px solid #ddd}
+    button.primary{padding:8px 12px;border-radius:6px;border:none;background:var(--accent);color:white;cursor:pointer}
+    .notice{background:#fff4cc;color:#5a3e00;padding:10px;border-radius:6px;margin-bottom:10px}
+    /* small helpers */
+    .muted{font-size:0.85rem;color:#666}
+    .top-right-badge{position:fixed;right:14px;top:14px;background:rgba(0,0,0,0.45);color:white;padding:6px 10px;border-radius:8px;font-weight:700}
+    .update-banner{position:fixed;left:50%;transform:translateX(-50%);bottom:70px;background:#2b6cb0;color:white;padding:10px 14px;border-radius:8px;display:flex;gap:10px;align-items:center}
+    /* light theme */
+    body.light{background:#f2f4f7;color:var(--text-dark)}
+    body.light .taskbar{background:rgba(255,255,255,0.9)}
+    body.light .window{color:var(--text-dark)}
+    body.light .title{background:#1f6feb}
   </style>
 </head>
 <body>
-  <div class="desktop">
-    <div class="icon" onclick="openWindow('app')">
-      <img src="https://cdn-icons-png.flaticon.com/512/841/841364.png" alt="App">
-      <span>App FDS</span>
+  <div class="top-right-badge">FDS OS — BETA</div>
+
+  <div class="desktop" id="desktop">
+    <div class="icon" onclick="openWin('app')">
+      <img src="https://cdn-icons-png.flaticon.com/512/841/841364.png" alt="app">
+      <div>App</div>
     </div>
-    <div class="icon" onclick="openWindow('calc')">
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135692.png" alt="Calc">
-      <span>Calculadora</span>
+
+    <div class="icon" onclick="openWin('calc')">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135692.png" alt="calc">
+      <div>Calculadora</div>
     </div>
-    <div class="icon" onclick="openWindow('web')">
-      <img src="https://cdn-icons-png.flaticon.com/512/84/84470.png" alt="Web">
-      <span>Navegador</span>
+
+    <div class="icon" onclick="openWin('web')">
+      <img src="https://cdn-icons-png.flaticon.com/512/84/84470.png" alt="web">
+      <div>Navegador</div>
     </div>
-    <div class="icon" onclick="openWindow('license')">
-      <img src="https://cdn-icons-png.flaticon.com/512/942/942751.png" alt="Licença">
-      <span>Licença</span>
+
+    <div class="icon" onclick="openWin('notepad')">
+      <img src="https://cdn-icons-png.flaticon.com/512/1827/1827569.png" alt="note">
+      <div>Bloco de notas</div>
     </div>
-    <div class="icon" onclick="openWindow('settings')">
-      <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="Configurações">
-      <span>Configurações</span>
+
+    <div class="icon" onclick="openWin('settings')">
+      <img src="https://cdn-icons-png.flaticon.com/512/2099/2099058.png" alt="settings">
+      <div>Configurações</div>
     </div>
+
+    <div class="icon" onclick="openWin('license')">
+      <img src="https://cdn-icons-png.flaticon.com/512/942/942751.png" alt="license">
+      <div>Licença</div>
+    </div>
+
+    <div class="icon" onclick="openWin('update')">
+      <img src="https://cdn-icons-png.flaticon.com/512/565/565547.png" alt="update">
+      <div>Update</div>
+    </div>
+
     <div class="icon" onclick="shutdown()">
-      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="Power">
-      <span>Desligar</span>
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" alt="power">
+      <div>Desligar</div>
     </div>
   </div>
+
   <div class="taskbar">
-    <div class="start">FDS Beta</div>
+    <div class="start" onclick="toggleMenu()">FDS</div>
     <div class="clock" id="clock"></div>
   </div>
 
-  <div class="window" id="app">
-    <div class="window-header">
-      <span>Janela FDS</span>
-      <button class="close-btn" onclick="closeWindow('app')"></button>
-    </div>
-    <div class="window-content">
-      Bem-vindo ao <strong>FDS OS Beta</strong> 🚀
-    </div>
-  </div>
-
-  <div class="window" id="calc">
-    <div class="window-header">
-      <span>Calculadora</span>
-      <button class="close-btn" onclick="closeWindow('calc')"></button>
-    </div>
-    <div class="window-content calc">
-      <input type="text" id="calc-display" readonly>
-      <div>
-        <button onclick="press('7')">7</button>
-        <button onclick="press('8')">8</button>
-        <button onclick="press('9')">9</button>
-        <button onclick="press('/')">/</button>
-      </div>
-      <div>
-        <button onclick="press('4')">4</button>
-        <button onclick="press('5')">5</button>
-        <button onclick="press('6')">6</button>
-        <button onclick="press('*')">*</button>
-      </div>
-      <div>
-        <button onclick="press('1')">1</button>
-        <button onclick="press('2')">2</button>
-        <button onclick="press('3')">3</button>
-        <button onclick="press('-')">-</button>
-      </div>
-      <div>
-        <button onclick="press('0')">0</button>
-        <button onclick="press('.')">.</button>
-        <button onclick="calculate()">=</button>
-        <button onclick="press('+')">+</button>
-      </div>
-      <div>
-        <button onclick="press('(')">(</button>
-        <button onclick="press(')')">)</button>
-        <button onclick="press('%')">%</button>
-        <button onclick="clearCalc()">C</button>
-      </div>
+  <!-- Windows -->
+  <div id="app" class="window" style="left:120px;top:80px">
+    <div class="title"><div class="title-text">App FDS</div><button class="close" onclick="closeWin('app')">×</button></div>
+    <div class="body">
+      <h3>Bem-vindo ao FDS OS (BETA)</h3>
+      <p class="muted">Sistema simulado, com funcionalidades web — aproveite!</p>
     </div>
   </div>
 
-  <div class="window" id="web">
-    <div class="window-header">
-      <span>Navegador</span>
-      <button class="close-btn" onclick="closeWindow('web')"></button>
-    </div>
-    <div class="window-content">
-      <input type="text" id="url" placeholder="Digite a URL" style="width: 80%">
-      <button onclick="openSite()">Ir</button>
-      <iframe id="browser" src="https://www.google.com"></iframe>
-    </div>
-  </div>
-
-  <div class="window" id="license">
-    <div class="window-header">
-      <span>Termo de Licença</span>
-      <button class="close-btn" onclick="closeWindow('license')"></button>
-    </div>
-    <div class="window-content license">
-      <h3>Termo de Licença do FDS OS Beta</h3>
-      <p>Ao utilizar este sistema, você concorda que ele é experimental, pode conter falhas e é oferecido "como está".</p>
-      <p>Este software não oferece garantias de estabilidade ou suporte oficial. Uso por sua conta e risco.</p>
-      <p>© 2025 FDS Softwares.</p>
+  <div id="calc" class="window" style="left:160px;top:110px">
+    <div class="title"><div class="title-text">Calculadora</div><button class="close" onclick="closeWin('calc')">×</button></div>
+    <div class="body calc">
+      <input id="calcDisplay" type="text" readonly />
+      <div class="row">
+        <button onclick="cpress('7')">7</button><button onclick="cpress('8')">8</button><button onclick="cpress('9')">9</button><button onclick="cpress('/')">÷</button>
+      </div>
+      <div class="row">
+        <button onclick="cpress('4')">4</button><button onclick="cpress('5')">5</button><button onclick="cpress('6')">6</button><button onclick="cpress('*')">×</button>
+      </div>
+      <div class="row">
+        <button onclick="cpress('1')">1</button><button onclick="cpress('2')">2</button><button onclick="cpress('3')">3</button><button onclick="cpress('-')">−</button>
+      </div>
+      <div class="row">
+        <button onclick="cpress('0')">0</button><button onclick="cpress('.')">.</button><button onclick="ceval()">=</button><button onclick="cpress('+')">+</button>
+      </div>
+      <div class="row"><button onclick="cclear()" style="flex:1">C</button></div>
     </div>
   </div>
 
-  <div class="window" id="settings">
-    <div class="window-header">
-      <span>Configurações</span>
-      <button class="close-btn" onclick="closeWindow('settings')"></button>
-    </div>
-    <div class="window-content settings">
-      <h3>Inserir Chave de Produto</h3>
-      <input type="text" id="productKey" placeholder="XXXXX-XXXXX-XXXXX">
-      <button onclick="activateKey()">Ativar</button>
-      <p id="activation-status"></p>
+  <div id="web" class="window" style="left:200px;top:140px;height:180px">
+    <div class="title"><div class="title-text">Navegador</div><button class="close" onclick="closeWin('web')">×</button></div>
+    <div class="body">
+      <input id="urlInput" type="text" placeholder="digite a url (ex: example.com)" />
+      <button class="primary" onclick="openExternal()">Abrir (nova aba)</button>
+      <p class="muted">Abre a URL em nova aba — não é iframe para evitar bloqueios.</p>
     </div>
   </div>
 
-  <div id="shutdown" class="shutdown-screen" style="display:none;">Desligando...</div>
+  <div id="notepad" class="window" style="left:240px;top:170px">
+    <div class="title"><div class="title-text">Bloco de Notas</div><button class="close" onclick="closeWin('notepad')">×</button></div>
+    <div class="body">
+      <textarea id="noteArea" style="height:230px"></textarea>
+      <div style="margin-top:8px"><button class="primary" onclick="saveNote()">Salvar nota no local</button></div>
+    </div>
+  </div>
 
-  <script>
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString();
+  <div id="settings" class="window" style="left:280px;top:200px">
+    <div class="title"><div class="title-text">Configurações</div><button class="close" onclick="closeWin('settings')">×</button></div>
+    <div class="body">
+      <div class="field">
+        <label>Nome do Usuário</label>
+        <input id="userName" type="text" />
+      </div>
+
+      <div class="field">
+        <label>Chave de produto</label>
+        <input id="productKey" type="text" placeholder="XXXXX-XXXXX"/>
+      </div>
+
+      <div class="field">
+        <label>Tema</label>
+        <button class="primary" onclick="applyTheme('dark')">Escuro</button>
+        <button class="primary" onclick="applyTheme('light')">Claro</button>
+      </div>
+
+      <div class="field">
+        <label>Papel de parede (URL)</label>
+        <input id="wallUrl" type="text" placeholder="https://.../imagem.jpg" />
+        <div style="margin-top:8px"><button class="primary" onclick="setWallpaper()">Aplicar</button></div>
+      </div>
+
+      <hr>
+
+      <h4>Configurar repositório de update (opcional)</h4>
+      <div class="muted">Se você (administrador) quiser liberar updates que serão aplicados para TODOS os usuários, insira aqui:</div>
+
+      <div class="field">
+        <label>GitHub user/org</label>
+        <input id="ghUser" type="text" placeholder="seu-usuario" />
+      </div>
+      <div class="field">
+        <label>Repositório (ex: fds-os)</label>
+        <input id="ghRepo" type="text" placeholder="seu-repo" />
+      </div>
+      <div class="field">
+        <label>Branch (geralmente main)</label>
+        <input id="ghBranch" type="text" value="main" />
+      </div>
+      <div class="field">
+        <label>Token GitHub (PAT com scopes repo)</label>
+        <input id="ghToken" type="password" placeholder="seu_token_aqui" />
+      </div>
+      <div class="muted">OBS: armazenar token no navegador é perigoso — use com cuidado. Se não preencher, o Update ainda funcionará para ler /update.json publicado na sua Pages; para escrever (liberar update global) precisamos do token + repo.</div>
+      <div style="margin-top:8px"><button class="primary" onclick="saveSettings()">Salvar Configurações</button></div>
+    </div>
+  </div>
+
+  <div id="license" class="window" style="left:320px;top:230px">
+    <div class="title"><div class="title-text">Termo de Licença</div><button class="close" onclick="closeWin('license')">×</button></div>
+    <div class="body">
+      <p>Este FDS OS (BETA) é uma simulação web para diversão/experimentação. Use por sua conta e risco. © FDS 2025</p>
+    </div>
+  </div>
+
+  <!-- Update window -->
+  <div id="update" class="window" style="left:360px;top:260px">
+    <div class="title"><div class="title-text">Update</div><button class="close" onclick="closeWin('update')">×</button></div>
+    <div class="body">
+      <div id="updateStatus" class="muted">Carregando estado de updates...</div>
+
+      <div style="margin-top:10px">
+        <label>Senha de liberação (quem tiver libera o update para todos):</label>
+        <input id="updatePass" type="password" placeholder="senha" />
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Nova versão (ex: 1.0.1)</label>
+        <input id="newVersion" type="text" placeholder="versão" />
+      </div>
+
+      <div style="margin-top:10px">
+        <label>Mensagem do update</label>
+        <input id="newMessage" type="text" placeholder="o que muda nessa versão" />
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="primary" onclick="releaseUpdate()">Liberar update (requere senha)</button>
+        <button onclick="forceCheck()">Verificar agora</button>
+      </div>
+
+      <hr />
+      <div class="muted">Instruções: para que o update seja efetivo para todos, o administrador com a senha secreta <strong>~1012FdS~</strong> deve preencher os campos e clicar em "Liberar update". Se você configurou repositório + token (em Configurações), o sistema tentará atualizar o arquivo <code>update.json</code> no seu repositório via GitHub API. Caso contrário, o administrador pode manualmente editar /update.json no repositório do GitHub Pages.</div>
+    </div>
+  </div>
+
+  <!-- Update banner that appears to all users when remote version > local -->
+  <div id="updateBanner" class="update-banner" style="display:none">
+    <div id="bannerText"></div>
+    <div><button class="primary" onclick="applyRemoteUpdate()">Aplicar</button></div>
+  </div>
+
+  <div id="shutdownScreen" style="display:none;position:fixed;inset:0;background:black;color:#0f0;align-items:center;justify-content:center;display:flex;font-size:22px">Desligando...</div>
+
+<script>
+/*
+  FDS OS — Sistema de updates global:
+  - Todos os clientes carregam /update.json (publicado no GitHub Pages ou raw URL).
+    Exemplo de update.json:
+      { "version":"1.0.0", "message":"Primeira versão", "released_at":"2025-09-20Txx:xx:xxZ" }
+  - Ao abrir a página, comparamos versão remota vs versão local (armazenada em localStorage).
+  - Se remota > local -> mostramos banner "Aplicar update".
+  - O app Update: quem tiver a senha especial "~1012FdS~" pode liberar um update.
+    * Se preenchido o repo + token nas configurações, o código tenta atualizar
+      o arquivo update.json no repositório via GitHub API (requere token com permissão repo).
+    * Se não houver token, o admin precisa editar update.json manualmente no repo.
+  - Observação: armazenar token no navegador é inseguro. Use com responsabilidade.
+*/
+
+/* ---------------------- util e estado ---------------------- */
+const SECRET_UPDATE_PASS = "~1012FdS~";
+const LOCAL_VERSION_KEY = "fdsos_local_version";
+const REMOTE_CHECK_URL_KEY = "fdsos_remote_url"; // where to fetch update.json (optional)
+const DEFAULT_REMOTE_RAW = "/update.json"; // default path on the same site (GitHub Pages)
+
+/* load settings from localStorage */
+function loadSettings(){
+  const s = JSON.parse(localStorage.getItem("fdsos_settings")||"{}");
+  document.getElementById("userName").value = s.userName||"";
+  document.getElementById("productKey").value = s.productKey||"";
+  document.getElementById("wallUrl").value = s.wallpaper||"";
+  document.getElementById("ghUser").value = s.ghUser||"";
+  document.getElementById("ghRepo").value = s.ghRepo||"";
+  document.getElementById("ghBranch").value = s.ghBranch||"main";
+  document.getElementById("ghToken").value = s.ghToken||"";
+}
+function saveSettings(){
+  const s = {
+    userName: document.getElementById("userName").value,
+    productKey: document.getElementById("productKey").value,
+    wallpaper: document.getElementById("wallUrl").value,
+    ghUser: document.getElementById("ghUser").value,
+    ghRepo: document.getElementById("ghRepo").value,
+    ghBranch: document.getElementById("ghBranch").value||"main",
+    ghToken: document.getElementById("ghToken").value
+  };
+  localStorage.setItem("fdsos_settings", JSON.stringify(s));
+  alert("Configurações salvas localmente.");
+  setWallpaper();
+}
+
+/* ---------------------- UI helpers ---------------------- */
+function openWin(id){ document.getElementById(id).style.display='flex'; }
+function closeWin(id){ document.getElementById(id).style.display='none'; }
+function toggleMenu(){ alert("Menu inicial simples — clique nos ícones para abrir apps."); }
+function shutdown(){ document.getElementById("shutdownScreen").style.display="flex"; setTimeout(()=>{ document.getElementById("shutdownScreen").style.display="none"; }, 1400); }
+
+/* clock */
+function tickClock(){ document.getElementById("clock").textContent = new Date().toLocaleTimeString(); }
+setInterval(tickClock,1000); tickClock();
+
+/* notepad save */
+function saveNote(){ localStorage.setItem("fdsos_note", document.getElementById("noteArea").value); alert("Nota salva localmente."); }
+(function loadNote(){ const n=localStorage.getItem("fdsos_note"); if(n) document.getElementById("noteArea").value=n; })();
+
+/* calc */
+function cpress(v){ const d=document.getElementById("calcDisplay"); d.value += v; }
+function clearCalc(){ document.getElementById("calcDisplay").value = ""; }
+function cclear(){ document.getElementById("calcDisplay").value = ""; }
+function ceval(){ try{ const r = Function('"use strict";return ('+document.getElementById("calcDisplay").value+')')(); document.getElementById("calcDisplay").value = r; }catch(e){ document.getElementById("calcDisplay").value = "Erro"; } }
+
+/* web open */
+function openExternal(){ const u=document.getElementById("urlInput").value.trim(); if(!u) return alert("Digite uma URL"); const url = u.startsWith("http")?u:"https://"+u; window.open(url,"_blank"); }
+
+/* theme & wallpaper */
+function applyTheme(t){
+  if(t==='light') document.body.classList.add('light'); else document.body.classList.remove('light');
+  localStorage.setItem("fdsos_theme", t);
+}
+function setWallpaper(){
+  const url=document.getElementById("wallUrl").value.trim();
+  if(url) {
+    document.body.style.background = `url('${url}') center/cover no-repeat`;
+    const s = JSON.parse(localStorage.getItem("fdsos_settings")||"{}");
+    s.wallpaper = url; localStorage.setItem("fdsos_settings", JSON.stringify(s));
+  } else {
+    document.body.style.background = "";
+  }
+}
+
+/* apply theme from storage */
+(function initTheme(){
+  const saved = JSON.parse(localStorage.getItem("fdsos_settings")||"{}");
+  if(saved.theme==='light') applyTheme('light');
+})();
+
+/* ---------------------- Update system ---------------------- */
+
+/**
+ * Compare semantic versions simply:
+ * returns -1 if a<b, 0 if equal, 1 if a>b
+ */
+function compareVersions(a,b){
+  const pa = (a||"0").split('.').map(n=>parseInt(n||0));
+  const pb = (b||"0").split('.').map(n=>parseInt(n||0));
+  const len = Math.max(pa.length,pb.length);
+  for(let i=0;i<len;i++){
+    const na = pa[i]||0, nb = pb[i]||0;
+    if(na<nb) return -1;
+    if(na>nb) return 1;
+  }
+  return 0;
+}
+
+/* fetch remote update.json (tries configured repo raw first if set, then relative /update.json) */
+async function fetchRemoteUpdate(){
+  const s = JSON.parse(localStorage.getItem("fdsos_settings")||"{}");
+  // prefer a configured raw URL if provided (raw.githubusercontent.com path)
+  if(s.ghUser && s.ghRepo && s.ghBranch){
+    // raw URL for update.json at repo root
+    const raw = `https://raw.githubusercontent.com/${s.ghUser}/${s.ghRepo}/${s.ghBranch}/update.json`;
+    try{
+      const res = await fetch(raw, {cache:'no-store'});
+      if(res.ok){ const j = await res.json(); j._source = raw; return j; }
+    }catch(e){ /* ignore */ }
+  }
+  // fallback to relative path on same host (e.g., https://davi10556.github.io/fds-os/update.json)
+  try{
+    const res2 = await fetch(DEFAULT_REMOTE_RAW, {cache:'no-store'});
+    if(res2.ok){ const j = await res2.json(); j._source = DEFAULT_REMOTE_RAW; return j; }
+  }catch(e){}
+  // no remote update found
+  return null;
+}
+
+/* check update and show banner if needed */
+async function checkForUpdatesOnLoad(){
+  const remote = await fetchRemoteUpdate();
+  const localVer = localStorage.getItem(LOCAL_VERSION_KEY) || "0.0.0";
+  if(remote && remote.version){
+    const cmp = compareVersions(localVer, remote.version);
+    if(cmp < 0){
+      // remote is newer
+      showUpdateBanner(remote);
+      document.getElementById("updateStatus").textContent = `Remoto: v${remote.version} — ${remote.message||''}`;
+    } else {
+      document.getElementById("updateStatus").textContent = `Sem updates (v${remote.version})`;
     }
-    setInterval(updateClock, 1000);
-    updateClock();
+  } else {
+    document.getElementById("updateStatus").textContent = `Nenhum arquivo update.json encontrado. (coloque /update.json no site ou configure repo)`;
+  }
+}
+function showUpdateBanner(remote){
+  const b = document.getElementById("updateBanner");
+  const t = document.getElementById("bannerText");
+  t.textContent = `Update disponível — v${remote.version}: ${remote.message||''}`;
+  b.dataset.source = remote._source||"";
+  b.dataset.version = remote.version||"";
+  b.style.display = "flex";
+}
 
-    function openWindow(id) {
-      document.getElementById(id).style.display = 'flex';
-    }
-    function closeWindow(id) {
-      document.getElementById(id).style.display = 'none';
-    }
+/* apply remote update: behavior here is simulated:
+   - sets local stored version to remote.version
+   - can show message / reload page
+*/
+function applyRemoteUpdate(){
+  const ver = document.getElementById("updateBanner").dataset.version || "";
+  if(!ver){ alert("Versão remota inválida."); return; }
+  localStorage.setItem(LOCAL_VERSION_KEY, ver);
+  alert("Update aplicado: v"+ver+"\n(O site foi marcado como atualizado localmente.)");
+  // optionally reload so new assets would be fetched (in real project)
+  // location.reload();
+  document.getElementById("updateBanner").style.display="none";
+}
 
-    function press(val) {
-      document.getElementById('calc-display').value += val;
-    }
-    function calculate() {
-      try {
-        document.getElementById('calc-display').value = eval(document.getElementById('calc-display').value);
-      } catch {
-        document.getElementById('calc-display').value = 'Erro';
+/* force check button in Update app */
+async function forceCheck(){
+  document.getElementById("updateStatus").textContent = "Verificando...";
+  await checkForUpdatesOnLoad();
+}
+
+/* releaseUpdate: admin enters password and fields; if password correct attempt to write update.json to GitHub via API
+   If token+repo provided -> try to update file there (requires proper scopes)
+   If not provided, show instructions for manual update (copy JSON and paste into update.json in repo).
+*/
+async function releaseUpdate(){
+  const pass = document.getElementById("updatePass").value;
+  if(pass !== SECRET_UPDATE_PASS){
+    return alert("Senha incorreta.");
+  }
+  const version = (document.getElementById("newVersion").value||"").trim();
+  const message = (document.getElementById("newMessage").value||"").trim();
+  if(!version){ return alert("Informe a nova versão."); }
+  // create update object
+  const updateObj = {
+    version: version,
+    message: message || "Atualização liberada pelo administrador",
+    released_at: new Date().toISOString()
+  };
+  // try write via GitHub API if token + repo configured
+  const s = JSON.parse(localStorage.getItem("fdsos_settings")||"{}");
+  if(s.ghUser && s.ghRepo && s.ghToken){
+    // We'll read current file to get sha (if exists), then PUT
+    try{
+      document.getElementById("updateStatus").textContent = "Tentando atualizar via GitHub API...";
+      const path = "update.json";
+      const apiGetUrl = `https://api.github.com/repos/${s.ghUser}/${s.ghRepo}/contents/${path}?ref=${encodeURIComponent(s.ghBranch||'main')}`;
+      const getRes = await fetch(apiGetUrl, { headers: { Authorization: `token ${s.ghToken}` }});
+      let sha = null;
+      if(getRes.ok){
+        const getJson = await getRes.json();
+        sha = getJson.sha;
       }
-    }
-    function clearCalc() {
-      document.getElementById('calc-display').value = '';
-    }
-
-    function openSite() {
-      const url = document.getElementById('url').value;
-      if(url) {
-        window.open(url.startsWith('http') ? url : 'https://' + url, '_blank');
-      }
-    }
-
-    function activateKey() {
-      const key = document.getElementById('productKey').value;
-      const status = document.getElementById('activation-status');
-      if(key.length >= 10) {
-        status.textContent = "✅ Chave aceita. Produto ativado.";
-        status.style.color = "green";
+      // prepare content
+      const contentStr = JSON.stringify(updateObj, null, 2);
+      const contentBase64 = btoa(unescape(encodeURIComponent(contentStr)));
+      const putUrl = `https://api.github.com/repos/${s.ghUser}/${s.ghRepo}/contents/${path}`;
+      const body = {
+        message: `FDS OS: liberar update v${version}`,
+        content: contentBase64,
+        branch: s.ghBranch || "main"
+      };
+      if(sha) body.sha = sha;
+      const putRes = await fetch(putUrl, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${s.ghToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+      if(putRes.ok){
+        alert("Update liberado no repositório! Todos os usuários que estiverem acessando o site vão detectar o update.");
+        // update local banner/state
+        localStorage.setItem(LOCAL_VERSION_KEY, localStorage.getItem(LOCAL_VERSION_KEY) || updateObj.version);
+        document.getElementById("updateStatus").textContent = `Remoto: v${updateObj.version} — ${updateObj.message}`;
+        // Optionally set remote URL in storage to point to raw file
+        const raw = `https://raw.githubusercontent.com/${s.ghUser}/${s.ghRepo}/${s.ghBranch||'main'}/update.json`;
+        localStorage.setItem(REMOTE_CHECK_URL_KEY, raw);
+        await checkForUpdatesOnLoad();
       } else {
-        status.textContent = "❌ Chave inválida.";
-        status.style.color = "red";
+        const err = await putRes.json().catch(()=>({message:'unknown'}));
+        alert("Falha ao atualizar via GitHub API: " + (err.message || JSON.stringify(err)));
       }
+    }catch(e){
+      alert("Erro ao tentar atualizar via API: " + e.message);
     }
+  } else {
+    // no token: provide JSON to copy so admin can manually add update.json to repo
+    const asText = JSON.stringify(updateObj, null, 2);
+    await navigator.clipboard.writeText(asText).catch(()=>{});
+    alert("Sem token/repo configurado. O JSON do update foi copiado para a área de transferência. Cole em um arquivo chamado update.json na raiz do repositório do GitHub Pages (ou no seu host).");
+  }
+}
 
-    function shutdown() {
-      document.getElementById('shutdown').style.display = 'flex';
-      setTimeout(() => {
-        document.getElementById('shutdown').style.display = 'none';
-      }, 2000);
-    }
-  </script>
+/* ---------------------- init ---------------------- */
+loadSettings();
+setWallpaper();
+(function autoCheck(){ // on load check remote update
+  checkForUpdatesOnLoad();
+})();
+
+/* add small accessibility: press Enter in update password to trigger release */
+document.getElementById("updatePass").addEventListener("keydown", (e)=>{ if(e.key==='Enter') releaseUpdate(); });
+
+/* expose some functions to console for debugging (optional) */
+window.fds_debug = {
+  fetchRemoteUpdate,
+  releaseUpdate,
+  applyRemoteUpdate,
+  forceCheck
+};
+</script>
 </body>
 </html>
